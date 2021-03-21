@@ -1,0 +1,86 @@
+Chainlink:
+- SafeMath library
+- Uses two interfaces for basic and advanced functions
+- ERC677 (allows transfer and call afterwards)
+- Increase/decrease approval
+- No minting function
+- No-one owns the contract (no auth)
+- Not upgradable
+
+Dai:
+- Sends event when new auth-ward added/removed
+- Simple auth mechanism for some functions (if msg.sender in this map?) - allows multiple owners
+- Modified safe math for add/sub functions
+- Minting function
+- Burning function
+- No protection against ERC20 front-running attack
+- Otherwise standard functions
+- EIP712 - Allows signed messages to be used to make transfers instead of direct transactions
+- Not upgradable
+
+Tether:
+- SafeMath library
+- Ownable interface for auth - only one owner (could be multisig)
+- Uses two interfaces for basic and advanced functions
+- Checks tx data size is correct for https://vessenes.com/the-erc20-short-address-attack-explained/
+- Uses a fee system which transfers a % of the requested amount and reduces the original xfer amount.
+- Does protect against ERC20 front-running attack
+- No short circuiting for 0 fee????
+- Pausable contract, only allows transfers when not paused (approvals still go through okay)
+- Blacklist - users can be added/removed from the blacklist, which prevents non-owners from moving their funds.
+    Owners can destroy the funds (not ERC20 compliant as doesn't issue a Transfer event to the 0 address).
+- Mint/burn (issue/redeem) are not ERC20 compliant
+- Upgradable (not used), blacklist feature always present (run before delegate contract called)
+
+Uniswap:
+- SafeMath library
+- Minting allowed
+    - one minter defined, can change (current minters choice)
+    - minting only once every year
+    - Amount and new total supply must be < 2^96, and at most 2% of previous total supply
+    - Minter can choose address who gets new tokens
+- Does not protect against ERC20 attack, and explicitly notes this
+- Has mechanism for approval infinite amount (== max value)
+- EIP712 - Allows signed messages to be used to make transfers instead of direct transactions
+- Not upgradable
+- Extra delegate system on top, which allows voting on the UNISWAP protocol (defined elsewhere)
+
+USDC:
+- Library for checking if address is a contract
+- Uses proxy contract for upgradability, including admin proxy
+
+USDCv1:
+- Ownable
+- Blacklistable
+- Pausable
+- SafeMath
+- Uses two interfaces for ERC20 basic and advanced functions
+- Minting allowed
+    - Only for approved minter list
+    - Minters can only be edited by "master minter" address
+    - Only owner can change master minter
+    - Burning allowed
+- Does not protect against ERC20 frontrunning attack
+
+USDCv2:
+- ECRecover lib
+- SafeMath
+- Single interface contract for ERC20
+- Ownable
+- Pausable
+- Blacklistable
+- Minting allowed
+    - Only for approved minter list
+    - Minters can only be edited by "master minter" address
+    - Only owner can change master minter
+    - Burning allowed
+- Address library (isContract, function call helpers)
+- Includes "increase"/"decrease" on top of "approve"
+- EIP712 for all ERC20 functions
+- "Rescuable" contract - allows funds in the contract itself to be transferred (I guess by mistake?)
+
+Binance:
+- SafeMath
+- Pretty basic overall
+- Ability to self - freeze funds (make unavailable for "transferFrom" use). Possibly not ERC20 compliant?
+- No protection against ERC20 front-running
